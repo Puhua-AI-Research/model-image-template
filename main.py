@@ -19,7 +19,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from package import Model
 
-model = Model(model_name="yolov8n", model_path="yolov8n.pt")
+model = Model()
 model.load()
 
 # 创建FastAPI应用

@@ -27,6 +27,7 @@ COPY . .
 # 暴露端口
 EXPOSE 8000
 
+# 拉取模型权重，或者 copy 本地模型也可以
 
 # 可选：使用 uvicorn 直接启动（更适合生产环境）
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"] 
