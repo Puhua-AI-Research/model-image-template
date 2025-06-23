@@ -59,7 +59,7 @@ async def predict(request: InferenceRequest):
     # 读取图片
     image = await request.file.read()
     # 调用模型推理
-    result = model.predict(image)
+    result = model.predict(data=image, threshold=request.threshold)
     return result
     
 

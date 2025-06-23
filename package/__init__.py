@@ -9,5 +9,5 @@ class Model:
     def load(self):
         pass
 
-    def predict(self, data: dict):
+    def predict(self, **kwargs):
         pass
