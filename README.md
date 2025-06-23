@@ -48,6 +48,7 @@ docker run -p 8000:8000 yolo-inference-service
 ```bash
 curl http://localhost:8000/health
 ```
+![](docs/api.png)
 
 ### 图像推理
 
