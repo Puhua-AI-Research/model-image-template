@@ -13,7 +13,7 @@ from datetime import datetime
 import traceback
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -47,19 +47,17 @@ async def health_check():
     return {"status": "healthy"}
 
 
-class InferenceRequest(BaseModel):
-    """推理请求模型"""
-    file: UploadFile = File(..., description="上传图片文件")
-    threshold: float = Field(default=0.5, ge=0.0, le=1.0, description="置信度阈值")
-
 
 @app.post("/predict")
-async def predict(request: InferenceRequest):
+async def predict(
+    file: UploadFile = File(..., description="上传图片文件"),
+    threshold: float = Form(default=0.5, ge=0.0, le=1.0, description="置信度阈值"),
+    topk:int = Form(default=1,ge=1,description="分类TOPK")):
     """执行推理"""
     # 读取图片
-    image = await request.file.read()
+    image = await file.read()
     # 调用模型推理
-    result = model.predict(data=image, threshold=request.threshold)
+    result = model.predict(data=image, threshold=threshold)
     return result
     
 
