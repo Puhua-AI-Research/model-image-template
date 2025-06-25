@@ -39,6 +39,7 @@
 	- unet/
 		- model.nb
 		- model.yaml
+- docs/ # 相关文档
 ```
 
 # 三、推理服务测试
@@ -111,6 +112,8 @@ curl -X POST "http://localhost:8000/predict" \
 ------
 
 # 四、相关文档
+
+- [后端接口说明](docs/[后端接口说明].md)
 
 - [基于mobilenetv1的服务接口测试](docs/[基于mobilenetv1的服务接口测试].md)
 - [基于yolov5的服务接口测试](docs/[基于yolov5的服务接口测试].md)
