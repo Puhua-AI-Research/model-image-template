@@ -4,8 +4,9 @@
 - 接入`Fastdeploy`后端提供模型推理服务(已验证`XPU(R200)`)
   - 已验证模型: `mobilenetv1`(分类)、 `yolov5`(检测)、 `unet`(分割)
 
-
 # 二、目录结构
+
+> `Dockerfile`仅供参靠，部署服务时需自行核对环境变量是否正确以及服务文件是否拷贝！！！
 
 ```bash
 - main.py # 服务启动代码，推理接口 `/predict` 接收: file, threshold, topk
