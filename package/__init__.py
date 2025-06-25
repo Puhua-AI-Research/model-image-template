@@ -1,6 +1,9 @@
-# 模型管理器
+# 模型管理器: 导出Model供服务调用
+from package.deploymodel import Model
 
 
+
+"""
 class Model:
     def __init__(self):
         pass
@@ -10,3 +13,4 @@ class Model:
 
     def predict(self, **kwargs):
         pass
+"""
