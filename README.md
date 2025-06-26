@@ -1,193 +1,122 @@
-# 图像推理服务 模版 
+# 一、Demo介绍
 
-这是一个基于 FastAPI 的 图像推理服务 模版，支持 Docker 容器化部署。
+- 构建可拓展多后端的模型管理(`deploymodel.py`)
+- 接入`Fastdeploy`后端提供模型推理服务(已验证`XPU(R200)`)
+  - 已验证模型: `mobilenetv1`(分类)、 `yolov5`(检测)、 `unet`(分割)
 
-## 功能特性
+# 二、目录结构
 
-- ✅ **FastAPI Web 框架** - 高性能异步 API 服务
-- ✅ **YOLO 模型推理** - 专门针对 YOLOv8 目标检测
-- ✅ **图像上传处理** - 支持图像文件上传和推理
-- ✅ **置信度阈值** - 可调节的检测置信度阈值
-- ✅ **健康检查** - 服务状态监控
-- ✅ **Docker 支持** - 完整的容器化部署方案
-- ✅ **API 文档** - 自动生成的 OpenAPI 文档
-
-## 快速开始
-
-### 1. 本地运行
+> `Dockerfile`仅供参靠，部署服务时需自行核对环境变量是否正确以及服务文件是否拷贝！！！
 
 ```bash
-# 安装依赖
-pip install -r requirements.txt
-
-# 确保有 package 模块和 yolov8n.pt 模型文件
-
-# 运行服务
-python main.py
+- main.py # 服务启动代码，推理接口 `/predict` 接收: file, threshold, topk
+- test_server.sh # 打包镜像前需自行测试目标接口是否可正常启动
+- requirements.txt
+- Dockerfile
+- README.md
+- package/ # 自定义推理库
+	- __init__.py # 引出Model供外部调用
+	- deploymodel.py # 实现外部接口Model
+	- backends.py # 整合fd等目录下后端的推理接口
+	- base_option.py # 通用推理配置项基类
+	- model/ # 存放模型目录
+		- model.nb # 存放序列化模型
+		- model.yaml
+	- fd/ # fastdeploy作为推理后端接口库——提供了基本的接口模板
+		- __init__.py # 提供特定模型的推理接口
+		- utils.py # 提供创建fastdeploy推理接口的创建函数，推理配置项的创建函数等
+		- models.py # 注册各种模型的推理接口，具体结构可在该目录下自行实现后导入注册
+- test_models/ # 测试模型文件目录
+	- test_imgs/
+		- cityscapes_demo.png
+		- ILSVRC2012_val_00000010.jpeg
+	- mobilenetv1/
+		- model.nb
+		- model.yaml
+	- yolov5/
+		- model.nb
+		- model.yaml
+	- unet/
+		- model.nb
+		- model.yaml
+- docs/ # 相关文档
 ```
 
-### 2. Docker 部署
+# 三、推理服务测试
+
+- 通过`test_server.sh`启动服务测试:
 
 ```bash
-# 构建镜像
-docker build -t yolo-inference-service .
+# 参数说明
+# model_path: 模型存放路径
+# params_path: 权重路径 —— pdmodel模型时必须
+# model_type: 模型类型 —— cls、det、seg
+# model_name: 模型名 —— 用于搜索接口，需要与注册的模型推理接口(注册别名)一致
+# deploy_device: 推理设备 —— 可用于运行时配置，避免运行在错误的设备
+# deploy_backend: 后端类型 —— 目前仅支持fastdeploy，后期自行扩展后可改为其它后端
 
-# 运行容器
-docker run -p 8000:8000 yolo-inference-service
+bash test_server.sh --model_path package/model/model.nb --params_path "" --model_type cls --model_name mobilenetv1 --deploy_device xpu --deploy_backend fastdeploy
 ```
 
-### 3. 访问服务
+- 运行日志位于同目录的`server.log`
+- 健康检查接口: 
 
-- **API 文档**: http://localhost:8000/docs
-- **健康检查**: http://localhost:8000/health
-
-## API 接口
-
-### 健康检查
+测试指令:
 
 ```bash
-curl http://localhost:8000/health
+curl -X GET "http://localhost:8000/health"
 ```
-![](docs/api.png)
 
-### 图像推理
+运行结果:
 
 ```bash
-# 上传图片进行目标检测
-curl -X POST http://localhost:8000/predict \
-  -F "file=@your_image.jpg" \
-  -F "threshold=0.5"
+{"status":"healthy"}
 ```
 
-**参数说明：**
-- `file`: 图片文件（必需）
-- `threshold`: 置信度阈值，范围 0.0-1.0（默认 0.5）
+> 模型正常加载后即可访问该接口，否则无法访问——服务出发异常！！！
 
-## 代码结构
+------
 
-```python
-# main.py 主要组件
+- 推理执行接口:
 
-# 1. 模型初始化
-from package import Model
-model = Model(model_name="yolov8n", model_path="yolov8n.pt")
-model.load()
-
-# 2. 推理接口
-@app.post("/predict")
-async def predict(request: InferenceRequest):
-    image = await request.file.read()
-    result = model.predict(image)
-    return result
-```
-
-## 环境变量配置
-
-- `HOST`: 服务绑定地址 (默认: 0.0.0.0)
-- `PORT`: 服务端口 (默认: 8000)
-- `WORKERS`: 工作进程数 (默认: 1)
-
-## 目录结构
-
-```
-.
-├── main.py                 # 主应用文件
-├── requirements.txt        # Python 依赖
-├── Dockerfile             # Docker 镜像构建文件
-├── .dockerignore          # Docker 忽略文件
-├── README.md              # 说明文档
-├── package/               # 模型包目录
-│   └── __init__.py        # Model 类实现
-├── yolov8n.pt            # YOLO 模型文件
-└── logs/                  # 日志文件目录
-```
-
-## 自定义扩展
-
-### 1. 更换模型
-
-修改模型初始化部分：
-
-```python
-# 使用不同的 YOLO 模型
-model = Model(model_name="yolov8s", model_path="yolov8s.pt")
-# 或者
-model = Model(model_name="yolov8m", model_path="yolov8m.pt")
-```
-
-### 2. 添加预处理
-
-在 `predict` 函数中添加图像预处理：
-
-```python
-@app.post("/predict")
-async def predict(request: InferenceRequest):
-    image = await request.file.read()
-    
-    # 添加图像预处理
-    # processed_image = preprocess(image)
-    
-    result = model.predict(image, threshold=request.threshold)
-    return result
-```
-
-### 3. 扩展返回结果
-
-根据需要格式化推理结果：
-
-```python
-result = model.predict(image)
-return {
-    "detections": result,
-    "timestamp": datetime.now().isoformat(),
-    "model_name": "yolov8n",
-    "threshold": request.threshold
-}
-```
-
-## 部署建议
-
-### 开发环境
+测试指令:
 
 ```bash
-python main.py
+curl -X POST "http://localhost:8000/predict" \
+-F "file=@/home/FD_server/test_models/test_imgs/ILSVRC2012_val_00000010.jpeg" \
+-F "threshold=0.5"
 ```
 
-### 生产环境
+运行结果:
 
 ```bash
-# 使用 uvicorn 启动
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-
-# 或者使用 Docker
-docker run -d -p 8000:8000 --name yolo-service yolo-inference-service
+"{\"label_ids\": [332], \"scores\": [0.5769524574279785]}"
 ```
 
-### 性能优化
+------
 
-1. **GPU 支持**: 在 Dockerfile 中添加 CUDA 支持
-2. **模型优化**: 使用 TensorRT 或 ONNX 优化模型
-3. **并发处理**: 根据硬件配置调整 workers 数量
+测试指令:
 
-## 依赖要求
+```bash
+curl -X POST "http://localhost:8000/predict" \
+-F "file=@/home/FD_server/test_models/test_imgs/ILSVRC2012_val_00000010.jpeg" \
+-F "topk=5"
+```
 
-- Python 3.11+
-- FastAPI
-- uvicorn
-- package (自定义模型包)
-- yolov8n.pt (YOLO 模型文件)
+运行结果:
 
-## 常见问题
+```bash
+"{\"label_ids\": [332, 153, 283, 229, 204], \"scores\": [0.5769524574279785, 0.21825027465820312, 0.08904066681861877, 0.03889011964201927, 0.020315099507570267]}"
+```
 
-**Q: 如何添加新的 YOLO 模型？**
-A: 将模型文件放入项目目录，并修改 `Model` 初始化参数。
+------
 
-**Q: 支持哪些图像格式？**
-A: 支持常见的图像格式：JPG, PNG, BMP, TIFF 等。
+# 四、相关文档
 
-**Q: 如何调整检测精度？**
-A: 通过 `threshold` 参数调整置信度阈值，值越高精度越高但召回率越低。
+- [后端接口说明](docs/后端接口说明.md)
 
-## 许可证
-
-MIT License 
+- [基于mobilenetv1的服务接口测试](docs/基于mobilenetv1的服务接口测试.md)
+- [基于yolov5的服务接口测试](docs/基于yolov5的服务接口测试.md)
+- [基于unet的服务接口测试](docs/基于unet的服务接口测试.md)
+- [模型管理框架说明](docs/模型管理框架说明.md)
+- [接入其它后端推理框架的说明](docs/接入其它后端推理框架的说明.md)
