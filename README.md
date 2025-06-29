@@ -120,3 +120,4 @@ curl -X POST "http://localhost:8000/predict" \
 - [基于unet的服务接口测试](docs/基于unet的服务接口测试.md)
 - [模型管理框架说明](docs/模型管理框架说明.md)
 - [接入其它后端推理框架的说明](docs/接入其它后端推理框架的说明.md)
+- [模型推理镜像制作与测试](docs/模型推理镜像制作与测试.md)
