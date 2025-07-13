@@ -1,6 +1,7 @@
 import os, sys
 
 # 导入fastdeploy后端的推理接口创建函数、配置项创建函数以及推理结果处理函数
+import fastdeploy
 from package.fd import create_fd_inference_api, create_fd_option, process_fd_predict_result
 # 其余后端类似导入接口
 # from package.xxxx import create_xx_inference_api, create_xx_option, process_xx_predict_result
@@ -77,7 +78,8 @@ def _create_model(
             infer_option.model_path,
             infer_option.params_path,
             infer_option.config_path,
-            runtime_option = infer_option.runtime_option
+            runtime_option = infer_option.runtime_option,
+            model_format = fastdeploy.ModelFormat.SOPHGO if infer_option.deploy_device == "bpu" else fastdeploy.ModelFormat.PADDLE
         ) # 基于配置项自主构建有效的推理接口实例
     #elif deploy_backend == "xxxx":
     #    pass

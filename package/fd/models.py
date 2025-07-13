@@ -13,7 +13,7 @@ def register_cls_inference_api(model_list):
     return model_list
 
 register_cls_inference_api(
-    ["mobilenetv1", "shufflenetv2"]
+    ["mobilenetv1", "shufflenetv2", "resnet50"]
 )
 # 特别的模型可以手动注册
 # register_inference_api(xxxx, xxxx, xxxx)

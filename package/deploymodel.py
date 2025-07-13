@@ -21,8 +21,8 @@ class Model:
         self._params_path = os.getenv("PARAMS_PATH", "")
         self._model_name = os.getenv("MODEL_NAME", "")
         self._model_type = os.getenv("MODEL_TYPE", "")
-        self._deploy_device = os.getenv("DEPLOY_DIVICE", "xpu")
-        self._deploy_backend = os.getenv("DEPLOY_BACKNED", "fastdeploy")
+        self._deploy_device = os.getenv("DEPLOY_DEVICE", "xpu")
+        self._deploy_backend = os.getenv("DEPLOY_BACKEND", "fastdeploy")
 
     def load(self):
         """基于初始化结果构建推理后端，并加载模型
