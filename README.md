@@ -113,11 +113,12 @@ curl -X POST "http://localhost:8000/predict" \
 
 # 四、相关文档
 
-- [后端接口说明](docs/后端接口说明.md)
+- [后端接口说明](docs/后端接口说明.md) —— 重点
 - [基于mobilenetv1的服务接口测试](docs/基于mobilenetv1的服务接口测试.md)
 - [基于yolov5的服务接口测试](docs/基于yolov5的服务接口测试.md)
 - [基于unet的服务接口测试](docs/基于unet的服务接口测试.md)
-- [模型管理框架说明](docs/模型管理框架说明.md)
+- [模型管理框架说明](docs/模型管理框架说明.md) —— 重点
 - [接入其它后端推理框架的说明](docs/接入其它后端推理框架的说明.md)
-- [模型推理镜像制作与测试](docs/模型推理镜像制作与测试.md)
+- [模型推理镜像制作与测试](docs/模型推理镜像制作与测试.md) —— 重点
 - [BPU推理服务测试](docs/BPU推理服务测试.md)
+- [NPU推理服务测试](docs/BPU推理服务测试.md)

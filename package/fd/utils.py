@@ -81,7 +81,7 @@ def create_fd_option(
         _runtime_option.use_kunlunxin()
     elif deploy_device == "npu":
         _runtime_option.use_lite_backend()
-        _runtime_option.use_Ascend()
+        _runtime_option.use_ascend()
     elif deploy_device == "bpu":
         _runtime_option.use_sophgo()
     else:
