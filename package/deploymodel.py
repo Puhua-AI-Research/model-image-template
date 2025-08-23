@@ -40,6 +40,16 @@ class Model:
         )
         print("Load Model and Create API Cost Time:", (time.time()-_load_start_t)*1000., "ms")
 
+        if self._deploy_device == "npu":
+            print("Warm up Start At:", self._deploy_device)
+            _load_start_t = time.time()
+            # 1. get warmup_img
+            curr_path = os.path.dirname(os.path.abspath(__file__))
+            warmup_img = cv2.imread(os.path.join(curr_path, "warmup_img.jpeg"))
+            self.model.predict(warmup_img)
+            # 2. show warmup cost time
+            print("Model Warmup Cost Time:", (time.time()-_load_start_t)*1000., "ms")
+
     def predict(self, data, **kwargs):
         """模型推理接口
         1. 输入图像文件数据作为输入数据，其余参数自定义传入

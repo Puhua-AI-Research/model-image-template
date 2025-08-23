@@ -117,6 +117,8 @@ def process_fd_predict_result(
                 # 不支持mask, 自行匹配测试后再开启该处理
                 #_det_result["masks"].append(result.masks[idx])
                 #_det_result["contain_masks"].append(result.contain_masks[idx])
-        return json.dumps(_det_result)
+        # return json.dumps(_det_result)
+        return _det_result
     _result = fd.vision.utils.fd_result_to_json(result) # 获取Json格式结果
+    _result = json.loads(_result) # 取消转换——避免Json字符串被FastAPI强制转义
     return _result
